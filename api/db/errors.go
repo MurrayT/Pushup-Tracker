@@ -1,6 +1,9 @@
 package db
 
-import "strings"
+import (
+	"errors"
+	"strings"
+)
 
 // isUniqueErr returns true when err is a SQLite UNIQUE constraint violation.
 func isUniqueErr(err error) bool {
@@ -9,3 +12,9 @@ func isUniqueErr(err error) bool {
 	}
 	return strings.Contains(err.Error(), "UNIQUE constraint failed")
 }
+
+// ErrNotFound is returned when a record does not exist.
+var ErrNotFound = errors.New("not found")
+
+// ErrDuplicate is returned on unique constraint violations.
+var ErrDuplicate = errors.New("already exists")

@@ -15,12 +15,6 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-// ErrNotFound is returned when a record does not exist.
-var ErrNotFound = errors.New("not found")
-
-// ErrDuplicate is returned on unique constraint violations.
-var ErrDuplicate = errors.New("already exists")
-
 // CreateUser inserts a new user and returns the populated struct.
 // passwordHash should be a bcrypt hash of the plain-text password.
 func (db *DB) CreateUser(username, email, passwordHash string) (*User, error) {

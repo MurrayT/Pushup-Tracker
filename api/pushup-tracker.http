@@ -1,0 +1,45 @@
+### POST register request. Save token as global auth token to be reused
+# @name register
+POST http://localhost:8080/api/auth/register
+
+{
+"username": "steve",
+"email": "pete@steve.com",
+"password": "hunter2",
+"referral_code": "TEST"
+}
+
+> {%
+    client.global.set("auth_token", response.body.token);
+%}
+
+### POST login request. Save token as global auth token to be reused
+# @name login
+POST http://localhost:8080/api/auth/login
+
+{
+"username": "steve",
+"password": "hunter2"
+}
+
+> {%
+    client.global.set("auth_token", response.body.token);
+%}
+
+###
+# @name referral
+POST http://localhost:8080/api/referral
+Authorization: Bearer {{auth_token}}
+
+{
+"referralCode": "BPAC"
+}
+
+###
+POST http://localhost:8080/api/pushups
+Authorization: Bearer {{auth_token}}
+
+{
+"count": 10
+}
+

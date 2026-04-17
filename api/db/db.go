@@ -30,8 +30,17 @@ CREATE TABLE IF NOT EXISTS pushups (
     UNIQUE(user_id, date)         -- one record per user per day; use upsert to accumulate
 );
 
+CREATE TABLE IF NOT EXISTS referral_codes (
+    id         		INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    		INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    referral_code 	TEXT    NOT NULL UNIQUE,
+    created_at 		DATETIME DEFAULT CURRENT_TIMESTAMP,
+    expires_at 		DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_pushups_user_id ON pushups(user_id);
 CREATE INDEX IF NOT EXISTS idx_pushups_date    ON pushups(date);
+CREATE INDEX IF NOT EXISTS idx_referral_codes_referral_codes ON referral_codes(referral_code);
 `
 
 // Initialize opens (or creates) the SQLite database at path and runs migrations.
