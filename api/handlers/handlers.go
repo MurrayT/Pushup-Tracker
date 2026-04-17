@@ -39,9 +39,10 @@ func readJSON(r *http.Request, v any) error {
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 type registerRequest struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Username     string `json:"username"`
+	Email        string `json:"email"`
+	Password     string `json:"password"`
+	ReferralCode string `json:"referral_code"`
 }
 
 // Register godoc
@@ -55,8 +56,19 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if strings.TrimSpace(req.Username) == "" || strings.TrimSpace(req.Password) == "" {
-		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "username and password are required"})
+	if strings.TrimSpace(req.Username) == "" || strings.TrimSpace(req.Password) == "" || strings.TrimSpace(req.ReferralCode) == "" {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "username, password and referral_code are required"})
+		return
+	}
+
+	code, err := h.db.GetReferralCodeByCode(req.ReferralCode)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid referral code"})
+		return
+	}
+
+	if code.ExpiresAt.Before(time.Now().UTC()) {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "referral code has expired"})
 		return
 	}
 
@@ -243,4 +255,34 @@ func (h *Handler) GetPushupsForUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, resp)
+}
+
+// ── Referrals ───────────────────────────────────────────────────────────────────
+
+type ReferralCodeRequest struct {
+	ReferralCode string `json:"referralCode"`
+}
+
+// CreateReferralCode godoc
+//
+//	POST /api/referral
+//	Body: {"referral_code":"ABC123"}
+//	Creates a referral code for the authenticated user.
+func (h *Handler) CreateReferralCode(w http.ResponseWriter, r *http.Request) {
+	userID, _ := middleware.UserIDFromContext(r.Context())
+
+	var req ReferralCodeRequest
+
+	if err := readJSON(r, &req); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
+	}
+
+	res, err := h.db.CreateReferralCode(userID, req.ReferralCode)
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "internal error"})
+		return
+	}
+	writeJSON(w, http.StatusCreated, res)
+
 }

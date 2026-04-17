@@ -39,6 +39,9 @@ func main() {
 	// Users route
 	mux.HandleFunc("GET /api/users", middleware.Auth(h.ListUsers))
 
+	// Referral code route
+	mux.HandleFunc("POST /api/referral", middleware.Auth(h.CreateReferralCode))
+
 	log.Printf("Server starting on :%s", port)
 	if err := http.ListenAndServe(":"+port, mux); err != nil {
 		log.Fatalf("Server failed: %v", err)

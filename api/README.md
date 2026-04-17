@@ -21,6 +21,7 @@ pushup-tracker/
 ├── db/
 │   ├── db.go            # SQLite init & schema migrations
 │   ├── users.go         # User queries
+│   ├── referrals.go     # Referral code queries
 │   ├── pushups.go       # Pushup queries + graph response types
 │   └── errors.go        # Shared DB error helpers
 ├── handlers/
@@ -80,7 +81,8 @@ Create a new account.
 {
   "username": "alice",
   "email": "alice@example.com",
-  "password": "s3cr3t"
+  "password": "s3cr3t",
+  "referral_code": "referral"
 }
 ```
 
@@ -127,6 +129,23 @@ Returns all registered users (no passwords).
 }
 ```
 
+### Referrals
+
+#### `GET /api/referral` 🔒
+
+Creates a new referral code that can be shared with friends.
+
+**Request:**
+```json
+{ "referral_code": "shar3Me" }
+```
+
+**Response `201`:**
+```json
+{
+  "referral_code": "shar3Me"
+}
+```
 ---
 
 ### Pushups

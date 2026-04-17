@@ -2,7 +2,6 @@
 
 - Not using most secure hashing algo. API readme suggest using bcrypt
 - Need ability to log out
-- Need ability to verify user signups: either pregenerate registration code or have approval step by existing verified user
 - Configurable data path would be useful
 
 # frontend
