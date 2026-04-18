@@ -80,7 +80,6 @@ Create a new account.
 ```json
 {
   "username": "alice",
-  "email": "alice@example.com",
   "password": "s3cr3t",
   "referral_code": "referral"
 }
@@ -89,7 +88,7 @@ Create a new account.
 **Response `201`:**
 ```json
 {
-  "user": { "id": 1, "username": "alice", "email": "alice@example.com", "created_at": "..." },
+  "user": { "id": 1, "username": "alice", "created_at": "..." },
   "token": "<jwt>"
 }
 ```
@@ -123,8 +122,8 @@ Returns all registered users (no passwords).
 ```json
 {
   "users": [
-    { "id": 1, "username": "alice", "email": "alice@example.com", "created_at": "..." },
-    { "id": 2, "username": "bob",   "email": "bob@example.com",   "created_at": "..." }
+    { "id": 1, "username": "alice", "created_at": "..." },
+    { "id": 2, "username": "bob",   "created_at": "..." }
   ]
 }
 ```
@@ -231,7 +230,7 @@ for (const p of data.points) {
 
 1. **Password hashing** — The default uses SHA-256 + random salt (stdlib only). For production, replace with `golang.org/x/crypto/bcrypt`:
    ```go
-   // auth/password.go
+   // auth.tsx/password.go
    import "golang.org/x/crypto/bcrypt"
    hash, _ := bcrypt.GenerateFromPassword([]byte(plain), bcrypt.DefaultCost)
    bcrypt.CompareHashAndPassword([]byte(stored), []byte(plain))

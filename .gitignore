@@ -138,3 +138,22 @@ fabric.properties
 **/*.db-shm
 **/*.db-wal
 
+### react ###
+.DS_*
+*.log
+logs
+**/*.backup.*
+**/*.back.*
+
+node_modules
+bower_components
+
+.vite
+
+*.sublime*
+
+psd
+thumb
+sketch
+
+

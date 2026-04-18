@@ -1,12 +1,10 @@
 # api
 
-- Not using most secure hashing algo. API readme suggest using bcrypt
-- Need ability to log out
 - Configurable data path would be useful
 
 # frontend
 
-- Need frontend
+- 
 
 # gateway
 
@@ -15,5 +13,6 @@
 
 # project
 
-- Does it need more enterprise? Split services
-- external db
+- Password reset
+- Remove Account
+- Groups rather than all users

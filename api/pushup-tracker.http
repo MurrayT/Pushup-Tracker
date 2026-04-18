@@ -3,10 +3,9 @@
 POST http://localhost:8080/api/auth/register
 
 {
-"username": "steve",
-"email": "pete@steve.com",
+"username": "pete",
 "password": "hunter2",
-"referral_code": "TEST"
+"referral_code": "BPAC"
 }
 
 > {%

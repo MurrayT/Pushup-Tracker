@@ -27,14 +27,14 @@ func main() {
 
 	h := handlers.New(database)
 
-	// Auth routes (no auth required)
+	// Auth routes (no auth.tsx required)
 	mux.HandleFunc("POST /api/auth/register", h.Register)
 	mux.HandleFunc("POST /api/auth/login", h.Login)
 
-	// Pushup routes (auth required)
+	// Pushup routes (auth.tsx required)
 	mux.HandleFunc("POST /api/pushups", middleware.Auth(h.AddPushups))
-	mux.HandleFunc("GET /api/pushups", middleware.Auth(h.GetPushups))
-	mux.HandleFunc("GET /api/pushups/{user_id}", middleware.Auth(h.GetPushupsForUser))
+	mux.HandleFunc("GET /api/pushups", h.GetPushups)
+	mux.HandleFunc("GET /api/pushups/{user_id}", h.GetPushupsForUser)
 
 	// Users route
 	mux.HandleFunc("GET /api/users", middleware.Auth(h.ListUsers))
