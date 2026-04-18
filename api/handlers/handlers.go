@@ -40,15 +40,14 @@ func readJSON(r *http.Request, v any) error {
 
 type registerRequest struct {
 	Username     string `json:"username"`
-	Email        string `json:"email"`
 	Password     string `json:"password"`
 	ReferralCode string `json:"referral_code"`
 }
 
 // Register godoc
 //
-//	POST /api/auth/register
-//	Body: {"username":"alice","email":"alice@example.com","password":"s3cr3t"}
+//	POST /api/auth.tsx/register
+//	Body: {"username":"alice", "password":"s3cr3t", "referral_code":"shareWithMe"}
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	var req registerRequest
 	if err := readJSON(r, &req); err != nil {
@@ -78,9 +77,9 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.db.CreateUser(req.Username, req.Email, hash)
+	user, err := h.db.CreateUser(req.Username, hash)
 	if errors.Is(err, db.ErrDuplicate) {
-		writeJSON(w, http.StatusConflict, map[string]string{"error": "username or email already taken"})
+		writeJSON(w, http.StatusConflict, map[string]string{"error": "username already taken"})
 		return
 	}
 	if err != nil {
@@ -104,7 +103,7 @@ type loginRequest struct {
 
 // Login godoc
 //
-//	POST /api/auth/login
+//	POST /api/auth.tsx/login
 //	Body: {"username":"alice","password":"s3cr3t"}
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	var req loginRequest

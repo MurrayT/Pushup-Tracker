@@ -51,10 +51,11 @@ type QueryParams struct {
 
 // GraphPoint is one data point returned by the graph-ready query.
 type GraphPoint struct {
-	Date     string `json:"date"`
-	UserID   int64  `json:"user_id"`
-	Username string `json:"username"`
-	Count    int    `json:"count"`
+	Date       string `json:"date"`
+	UserID     int64  `json:"user_id"`
+	Username   string `json:"username"`
+	Count      int    `json:"count"`
+	Cumulative int    `json:"cumulative"`
 }
 
 // GraphResponse is the top-level response for the GET /pushups endpoint.
@@ -111,6 +112,7 @@ func (db *DB) GetPushupsForGraph(p QueryParams) (*GraphResponse, error) {
 
 	// Aggregate per user
 	userTotals := map[int64]*GraphUserSummary{}
+	userRunning := map[int64]int{}
 	var points []GraphPoint
 
 	for rows.Next() {
@@ -118,6 +120,8 @@ func (db *DB) GetPushupsForGraph(p QueryParams) (*GraphResponse, error) {
 		if err := rows.Scan(&gp.Date, &gp.UserID, &gp.Username, &gp.Count); err != nil {
 			return nil, err
 		}
+		userRunning[gp.UserID] += gp.Count
+		gp.Cumulative = userRunning[gp.UserID]
 		points = append(points, gp)
 
 		if _, ok := userTotals[gp.UserID]; !ok {

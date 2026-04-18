@@ -11,16 +11,15 @@ import (
 type User struct {
 	ID        int64     `json:"id"`
 	Username  string    `json:"username"`
-	Email     string    `json:"email"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
 // CreateUser inserts a new user and returns the populated struct.
 // passwordHash should be a bcrypt hash of the plain-text password.
-func (db *DB) CreateUser(username, email, passwordHash string) (*User, error) {
+func (db *DB) CreateUser(username, passwordHash string) (*User, error) {
 	res, err := db.Exec(
-		`INSERT INTO users (username, email, password) VALUES (?, ?, ?)`,
-		username, email, passwordHash,
+		`INSERT INTO users (username, password) VALUES (?, ?)`,
+		username, passwordHash,
 	)
 	if err != nil {
 		if isUniqueErr(err) {
@@ -37,8 +36,8 @@ func (db *DB) CreateUser(username, email, passwordHash string) (*User, error) {
 func (db *DB) GetUserByID(id int64) (*User, error) {
 	u := &User{}
 	err := db.QueryRow(
-		`SELECT id, username, email, created_at FROM users WHERE id = ?`, id,
-	).Scan(&u.ID, &u.Username, &u.Email, &u.CreatedAt)
+		`SELECT id, username, created_at FROM users WHERE id = ?`, id,
+	).Scan(&u.ID, &u.Username, &u.CreatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, ErrNotFound
 	}
@@ -53,8 +52,8 @@ func (db *DB) GetUserByUsername(username string) (*User, string, error) {
 	u := &User{}
 	var hash string
 	err := db.QueryRow(
-		`SELECT id, username, email, password, created_at FROM users WHERE username = ?`, username,
-	).Scan(&u.ID, &u.Username, &u.Email, &hash, &u.CreatedAt)
+		`SELECT id, username, password, created_at FROM users WHERE username = ?`, username,
+	).Scan(&u.ID, &u.Username, &hash, &u.CreatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, "", ErrNotFound
 	}
@@ -66,7 +65,7 @@ func (db *DB) GetUserByUsername(username string) (*User, string, error) {
 
 // ListUsers returns all users (without passwords).
 func (db *DB) ListUsers() ([]User, error) {
-	rows, err := db.Query(`SELECT id, username, email, created_at FROM users ORDER BY username`)
+	rows, err := db.Query(`SELECT id, username, created_at FROM users ORDER BY username`)
 	if err != nil {
 		return nil, fmt.Errorf("list users: %w", err)
 	}
@@ -75,7 +74,7 @@ func (db *DB) ListUsers() ([]User, error) {
 	var users []User
 	for rows.Next() {
 		var u User
-		if err := rows.Scan(&u.ID, &u.Username, &u.Email, &u.CreatedAt); err != nil {
+		if err := rows.Scan(&u.ID, &u.Username, &u.CreatedAt); err != nil {
 			return nil, err
 		}
 		users = append(users, u)
